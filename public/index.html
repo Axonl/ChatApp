@@ -1,11 +1,32 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="no">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Chatte-app!</title>
 </head>
 <body>
-    
+    <h1>Chatteapp</h1>
+    <div id="utskrift">
+        <!-- Fylles ut av JS -->
+    </div>
+
+    <script>
+        const utskrift = document.getElementById("utskrift");
+
+        async function skrivUtMeldinger() {    
+            const response = await fetch('/hentMeldinger');
+            const meldinger = await response.json();
+            // console.log(meldinger);
+
+            for (let melding of meldinger) {
+                const div = document.createElement('div');
+                div.innerHTML = "[" + melding.tid + "]<br> " + melding.Brukernavn + ": " + melding.melding;
+                utskrift.appendChild(div);
+            }
+        }
+
+        skrivUtMeldinger();
+    </script>
 </body>
 </html>

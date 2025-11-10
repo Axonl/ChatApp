@@ -1,3 +1,4 @@
+// Setter opp en Express-app
 const express = require('express');
 const app = express();
 
@@ -5,18 +6,21 @@ const app = express();
 const Database = require('better-sqlite3');
 const db = new Database('chat.db');
 
-// Eksempel på en rute, NB! ..som ikke sender korrekt HTML
+// Serve statiske filer fra public-mappen
+app.use(express.static('public'));
+
+// Eksempel på en rute
 app.get('/', (req, res) => {
-    res.send("Hei!");
+    res.sendFile(__dirname + '/public/index.html');
 });
 
-// Eksempel på en rute som sjekker om databasen fungerer, returnerer alle meldinger i JSON-format
+// Eksempel på en rute
 app.get('/hentMeldinger', (req, res) => {
     const row = db.prepare('SELECT * FROM melding').all();
     res.json(row);
 });
 
-// Åpner en port på serveren, og kjører den
+// Åpner en viss port på serveren, og nå kjører den
 app.listen(3000, () => {
     console.log('Server kjører på http://localhost:3000');
 });
