@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="no">
 <head>
+    <link rel="stylesheet" href="style.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chatte-app!</title>
@@ -10,6 +11,15 @@
     <div id="utskrift">
         <!-- Fylles ut av JS -->
     </div>
+    <form id="skjema">
+    <label for="navn">Navn:</label>
+    <input type="text" id="navn" required>
+
+    <label for="melding">Melding:</label>
+    <input type="text" id="melding" required>
+    
+    <button type="submit">Send melding</button>
+</form>
 
     <script>
         const utskrift = document.getElementById("utskrift");
@@ -21,12 +31,13 @@
 
             for (let melding of meldinger) {
                 const div = document.createElement('div');
-                div.innerHTML = "[" + melding.tid + "]<br> " + melding.Brukernavn + ": " + melding.melding;
+                div.innerHTML = "[" + melding.tid + "]<br> " + melding.person + ": " + melding.melding;
                 utskrift.appendChild(div);
             }
         }
 
         skrivUtMeldinger();
+
     </script>
 </body>
 </html>
