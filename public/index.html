@@ -4,10 +4,10 @@
     <link rel="stylesheet" href="style.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chatte-app!</title>
+    <title>Chatapp</title>
 </head>
 <body>
-    <h1>Chatteapp</h1>
+    <h1>Chatapp</h1>
     <div id="utskrift">
         <!-- Fylles ut av JS -->
     </div>
@@ -23,21 +23,47 @@
 
     <script>
         const utskrift = document.getElementById("utskrift");
+        const skjema = document.getElementById('skjema');
+        const navnEl = document.getElementById('navn');
+        const meldingEl = document.getElementById('melding');
 
         async function skrivUtMeldinger() {    
+            utskrift.innerHTML = '';
             const response = await fetch('/hentMeldinger');
             const meldinger = await response.json();
-            // console.log(meldinger);
 
             for (let melding of meldinger) {
                 const div = document.createElement('div');
-                div.innerHTML = "[" + melding.tid + "]<br> " + melding.person + ": " + melding.melding;
+                div.innerHTML = 
+                 "<span class='tid'>[" + melding.tid + "]</span><br> " +
+                 melding.person + ": " + melding.melding + "<br><br>";
+
                 utskrift.appendChild(div);
             }
         }
 
         skrivUtMeldinger();
 
+        skjema.addEventListener('submit', sendMelding);
+
+        async function sendMelding(e) {
+            // SPA - single page application = forhindre full sideoppdatering
+            e.preventDefault();
+
+            const person = navnEl.value.trim();
+            const melding = meldingEl.value.trim(); 
+            let tid = new Date().toISOString().replace('T', ' ').substring(0, 16); 
+
+
+            const res = await fetch('/sendMelding', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ person, melding, tid })
+            });
+
+            skrivUtMeldinger();
+            meldingEl.value = '';
+        }
     </script>
 </body>
 </html>
