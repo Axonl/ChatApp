@@ -27,6 +27,8 @@
         const skjema = document.getElementById('skjema');
         const navnEl = document.getElementById('navn');
         const meldingEl = document.getElementById('melding');
+        const romid = window.location.pathname.slice(1);
+        console.log("RomID:", romid);
 
         async function skrivUtMeldinger() {    
             utskrift.innerHTML = '';
@@ -53,13 +55,12 @@
 
             const person = navnEl.value.trim();
             const melding = meldingEl.value.trim(); 
-            let tid = new Date().toLocaleString().replace('T', ' ').substring(0, 17); 
-
+            let tid = new Date().toLocaleString().replace('T', ' ').substring(0, 17);
 
             const res = await fetch('/sendMelding', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ person, melding, tid })
+                body: JSON.stringify({ person, melding, tid, rom })
             });
 
             skrivUtMeldinger();

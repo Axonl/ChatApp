@@ -15,21 +15,41 @@ db.prepare(`
     )
 `).run();
 
+db.prepare(`
+    CREATE TABLE IF NOT EXISTS Rom (
+        romid INTEGER PRIMARY KEY AUTOINCREMENT,
+        Navn TEXT NOT NULL
+    )
+`).run();
+
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
 // Serve statiske filer fra public-mappen
 app.use(express.static('public'));
 
-// Eksempel på en rute
 app.get('/', (req, res) => {
-    res.sendFile(__dirname + '/public/index.html');
+    res.sendFile(__dirname + '/public/rom.html');
 });
 
 // Eksempel på en rute
 app.get('/hentMeldinger', (req, res) => {
     const row = db.prepare('SELECT * FROM melding').all();
     res.json(row);
+});
+
+app.get('/alleRom', (req, res) => {
+    const rows = db.prepare("SELECT * FROM Rom").all();
+    res.json(rows);
+});
+
+app.get('/rom/:romid', (req, res) => {
+    const id = req.params.romid;
+    const row = db.prepare("SELECT * FROM Rom WHERE romid = ?").get(id);
+    res.sendFile(__dirname + '/public/chat.html');
+    if (!row) {
+        return res.status(404).send("Rom finnes ikke.");
+    } 
 });
 
 app.post("/sendMelding", (req, res) => {
@@ -39,11 +59,12 @@ app.post("/sendMelding", (req, res) => {
         person = person.toString().trim();
         melding = melding.toString().trim();
         tid = tid.toString().trim();
+        rom = rom.toString().trim();
 
-        console.log("motatt melding:", { person, melding, tid });
+        console.log("motatt melding:", { person, melding, tid, rom });
 
-        db.prepare("INSERT INTO melding (person, melding, tid) VALUES (?, ?, ?)")
-          .run(person, melding, tid);
+        db.prepare("INSERT INTO melding (person, melding, tid, rom) VALUES (?, ?, ?, ?)")
+          .run(person, melding, tid, rom);
 
         return res.sendStatus(201);
 
