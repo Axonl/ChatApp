@@ -15,3 +15,13 @@ body{
     color: grey;
     font-size: 12px;
 }
+
+#romDiv{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#Romskjema{
+margin-left: 300px;
+}
