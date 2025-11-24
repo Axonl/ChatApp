@@ -1,6 +1,7 @@
 // Setter opp en Express-app
 const express = require('express');
 const app = express();
+const PORT = 3000;
 
 // Setter opp databasen
 const Database = require('better-sqlite3');
@@ -11,7 +12,8 @@ db.prepare(`
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         person TEXT NOT NULL,
         melding TEXT NOT NULL,
-        tid TEXT NOT NULL
+        tid TEXT NOT NULL,
+        rom INTEGER NOT NULL
     )
 `).run();
 
@@ -33,17 +35,23 @@ app.get('/', (req, res) => {
 });
 
 // Eksempel på en rute
-app.get('/hentMeldinger', (req, res) => {
-    const row = db.prepare('SELECT * FROM melding').all();
-    res.json(row);
-});
+app.get('/hentMeldinger/:rom', (req, res) => {
+    const rom = req.params.rom;
 
+    const rows = db.prepare(`
+        SELECT * FROM melding 
+        WHERE rom = ?
+        ORDER BY id ASC
+    `).all(rom);
+
+    res.json(rows);
+});
 app.get('/alleRom', (req, res) => {
     const rows = db.prepare("SELECT * FROM Rom").all();
     res.json(rows);
 });
 
-app.get('/rom/:romid', (req, res) => {
+app.get('/:romid', (req, res) => {
     const id = req.params.romid;
     const row = db.prepare("SELECT * FROM Rom WHERE romid = ?").get(id);
     res.sendFile(__dirname + '/public/chat.html');
@@ -52,9 +60,28 @@ app.get('/rom/:romid', (req, res) => {
     } 
 });
 
+app.post("/lagRom", (req, res) => {
+    try {
+        let { navn } = req.body;
+        navn = navn.toString().trim();
+
+        console.log("motatt romnavn:", { navn });
+
+        db.prepare("INSERT INTO Rom (Navn) VALUES (?)")
+            .run(navn);
+        return res.sendStatus(201);
+
+    } catch (err) {
+        console.error("Feil ved oppretting av rom:", err);
+        return res 
+            .status(500)
+            .json({ error: "Kunne ikke opprette rommet" });
+    }
+});
+
 app.post("/sendMelding", (req, res) => {
     try {
-        let { person, melding, tid } = req.body;
+        let { person, melding, tid, rom } = req.body;
 
         person = person.toString().trim();
         melding = melding.toString().trim();
@@ -77,6 +104,6 @@ app.post("/sendMelding", (req, res) => {
 });
 
 // Åpner en viss port på serveren, og nå kjører den
-app.listen(3000, () => {
-    console.log('Server kjører på http://localhost:3000');
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Server running on port ${PORT}`);
 });

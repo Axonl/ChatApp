@@ -11,6 +11,12 @@
         <!--Fylles ut av js-->
     </div>
 
+    <form id="Romskjema">
+        <label for="Romnavn">Rom navn:</label>
+        <input type="text" id="navn" required>
+         <button type="submit">Lag rom</button>
+    </form>
+
     <script>
         const romDiv = document.getElementById("romDiv");
 
@@ -30,6 +36,31 @@
             }
         }
         hentRom();
+
+        Romskjema.addEventListener('submit', lagRom);
+
+        async function lagRom(e) {
+            e.preventDefault();
+
+            const navnEl = document.getElementById('navn');
+            const navn = navnEl.value.trim();
+
+            const response = await fetch('/lagRom', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ navn })
+            });
+
+            if (response.ok) {
+                hentRom();
+                navnEl.value = '';
+            } else {
+                alert('Feil ved oppretting av rom');
+            }
+        }
+
     </script>
 
 </body>
