@@ -1,4 +1,5 @@
 // Setter opp en Express-app
+const bcrypt = require('bcrypt');
 const express = require('express');
 const app = express();
 const PORT = 3000;
@@ -6,6 +7,24 @@ const PORT = 3000;
 // Setter opp databasen
 const Database = require('better-sqlite3');
 const db = new Database('chat.db');
+
+async function hashPassword() { // bcrypt test
+const salt = bcrypt.genSaltSync(13);
+const password = "password123";
+
+console.time("hashing");
+const hash = await bcrypt.hash(password, salt);
+console.timeEnd("hashing");
+
+const match = await bcrypt.compare("password123", hash);
+
+console.log("Passord:",password);
+console.log("Salt:",salt);
+console.log("Hash:",hash);
+console.log("Match:", match)
+}
+
+hashPassword();
 
 db.prepare(`
     CREATE TABLE IF NOT EXISTS melding (
@@ -24,6 +43,8 @@ db.prepare(`
     )
 `).run();
 
+
+
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
@@ -31,10 +52,14 @@ app.use(express.json());
 app.use(express.static('public'));
 
 app.get('/', (req, res) => {
+    res.sendFile(__dirname + '/public/login.html');
+});
+
+app.get('/rom', (req, res) => {
     res.sendFile(__dirname + '/public/rom.html');
 });
 
-// Eksempel på en rute
+
 app.get('/hentMeldinger/:rom', (req, res) => {
     const rom = req.params.rom;
 
@@ -51,7 +76,7 @@ app.get('/alleRom', (req, res) => {
     res.json(rows);
 });
 
-app.get('/:romid', (req, res) => {
+app.get('/rom:romid', (req, res) => {
     const id = req.params.romid;
     const row = db.prepare("SELECT * FROM Rom WHERE romid = ?").get(id);
     res.sendFile(__dirname + '/public/chat.html');
@@ -59,6 +84,16 @@ app.get('/:romid', (req, res) => {
         return res.status(404).send("Rom finnes ikke.");
     } 
 });
+
+app.post("/signup", (req, res) => {
+
+});
+
+
+app.post("/login", (req, res) => {
+
+});
+
 
 app.post("/lagRom", (req, res) => {
     try {

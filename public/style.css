@@ -1,6 +1,6 @@
 #utskrift{
     width: 1800px; /* Set a width for your box */
-    height: 720px; /* Set a fixed height for your box */
+    height: 480px; /* Set a fixed height for your box */
     border: 1px solid #ccc; /* Add a border for visibility */
     overflow: auto; /* This is the key property for scrolling */
     padding: 10px; /* Add some padding if desired */

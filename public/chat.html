@@ -28,10 +28,10 @@
         const skjema = document.getElementById('skjema');
         const navnEl = document.getElementById('navn');
         const meldingEl = document.getElementById('melding');
-        const rom = window.location.pathname.split("/")[1];
+        const rom = window.location.pathname.split("/rom")[1];
         
 
-       async function skrivUtMeldinger() {
+       async function skrivUtMeldinger() { //skriver ut meldinger fra databasen
     utskrift.innerHTML = '';
 
     const response = await fetch(`/hentMeldinger/${rom}`);
@@ -53,8 +53,7 @@
 
         utskrift.appendChild(div);
     });
-
-    utskrift.appendChild(div);
+    utskrift.scrollTop = utskrift.scrollHeight;
 }
 
 
@@ -62,12 +61,15 @@
 
         skjema.addEventListener('submit', sendMelding);
 
-        async function sendMelding(e) {
-            // SPA - single page application = forhindre full sideoppdatering
+        async function sendMelding(e) { // sender melding til databasen
+
             e.preventDefault();
 
             const person = navnEl.value.trim();
             const melding = meldingEl.value.trim(); 
+
+            if (!person || !melding) return;
+
             let tid = new Date().toLocaleString().replace('T', ' ').substring(0, 17);
 
             const res = await fetch('/sendMelding', {
@@ -78,7 +80,9 @@
 
             skrivUtMeldinger();
             meldingEl.value = '';
+
         }
+setInterval(skrivUtMeldinger, 5000);
     </script>
 </body>
 </html>
