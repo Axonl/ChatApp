@@ -1,31 +1,17 @@
 // Setter opp en Express-app
-const bcrypt = require('bcrypt');
 const express = require('express');
 const app = express();
 const PORT = 3000;
+
+// setter opp Bcrypt
+const bcrypt = require('bcrypt');
+const saltRounds = 13;
 
 // Setter opp databasen
 const Database = require('better-sqlite3');
 const db = new Database('chat.db');
 
-async function hashPassword() { // bcrypt test
-const salt = bcrypt.genSaltSync(13);
-const password = "password123";
-
-console.time("hashing");
-const hash = await bcrypt.hash(password, salt);
-console.timeEnd("hashing");
-
-const match = await bcrypt.compare("password123", hash);
-
-console.log("Passord:",password);
-console.log("Salt:",salt);
-console.log("Hash:",hash);
-console.log("Match:", match)
-}
-
-hashPassword();
-
+//oppretter tabell hvi de ikke finnes
 db.prepare(`
     CREATE TABLE IF NOT EXISTS melding (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -40,6 +26,14 @@ db.prepare(`
     CREATE TABLE IF NOT EXISTS Rom (
         romid INTEGER PRIMARY KEY AUTOINCREMENT,
         Navn TEXT NOT NULL
+    )
+`).run();
+
+db.prepare(`
+    CREATE TABLE IF NOT EXISTS bruker (
+        Brukerid INTEGER PRIMARY KEY AUTOINCREMENT,
+        Brukernavn TEXT NOT NULL UNIQUE, 
+        Passord_Hash TEXT NOT NULL
     )
 `).run();
 
@@ -85,12 +79,58 @@ app.get('/rom:romid', (req, res) => {
     } 
 });
 
-app.post("/signup", (req, res) => {
+app.post("/signup", async (req, res) => {
+    const { brukernavn, passord } = req.body;
+    if (!brukernavn || !passord) {
+        return res.status(400).json({ error: "Brukernavn og passord er påkrevd." });
+    }
+
+    try {
+        const hashedPassord = await bcrypt.hash(passord, saltRounds);
+        const info = db.prepare("INSERT INTO bruker (Brukernavn, Passord_Hash) VALUES (?, ?)").run(brukernavn, hashedPassord);
+        console.log(`Ny bruker registrert: ${brukernavn} (ID: ${info.lastInsertRowid})`);
+        return res.status(201).json({ message: "Bruker registrert." });
+    } 
+    catch (err) {
+        console.error("Feil ved registrering av bruker:", err);
+
+        if (err.code === 'SQLITE_CONSTRAINT_UNIQUE') {
+            return res.status(409).json({ error: "Brukernavn er allerede tatt." });
+        }
+
+        return res.status(500).json({ error: "Kunne ikke registrere bruker." });
+    }
 
 });
 
 
-app.post("/login", (req, res) => {
+app.post("/login", async (req, res) => {
+const { brukernavn, passord } = req.body;
+if (!brukernavn || !passord) {
+    return res.status(400).json({ error: "Brukernavn og passord er påkrevd." });
+}
+
+try { const bruker = db.prepare("SELECT * FROM Bruker wHERE Brukernavn = ?").get(brukernavn);
+    
+    if (!bruker) {
+        return res.status(401).json({ error: "Ugyldig brukernavn eller passord." });
+    }
+    const match = await bcrypt.compare(passord, bruker.Passord_Hash);
+    if (!match) {
+        return res.status(401).json({ error: "Ugyldig brukernavn eller passord." });
+    }
+
+    if (match) {
+        console.log(`Bruker logget inn: ${brukernavn} (ID: ${bruker.Brukerid})`);
+        return res.status(200).json({ message: "Innlogging vellykket." });
+    }
+
+    return res.status(200).json({ message: "Innlogging vellykket." });
+
+    } catch (err) {
+    console.error("Feil ved innlogging:", err);
+    return res.status(500).json({ error: "Kunne ikke logge inn." });
+    }
 
 });
 

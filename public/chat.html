@@ -14,22 +14,22 @@
     </div>
 
     <form id="skjema">
-        <label for="navn">Navn:</label>
-        <input type="text" id="navn" required>
-
         <label for="melding">Melding:</label>
         <input type="text" id="melding" required>
-    
          <button type="submit">Send melding</button>
     </form>
 
     <script>
         const utskrift = document.getElementById("utskrift");
         const skjema = document.getElementById('skjema');
-        const navnEl = document.getElementById('navn');
         const meldingEl = document.getElementById('melding');
         const rom = window.location.pathname.split("/rom")[1];
-        
+        const innloggetBruker = sessionStorage.getItem('chatBrukernavn');
+
+        if (!innloggetBruker) {
+        alert("Du må logge inn for å få tilgang til chatten!");
+        window.location.href = "/";}
+            
 
        async function skrivUtMeldinger() { //skriver ut meldinger fra databasen
     utskrift.innerHTML = '';
@@ -65,12 +65,19 @@
 
             e.preventDefault();
 
-            const person = navnEl.value.trim();
+            const person = innloggetBruker;
             const melding = meldingEl.value.trim(); 
 
-            if (!person || !melding) return;
+            if (!person || !melding) return; //hindrer tomme meldinger
 
-            let tid = new Date().toLocaleString().replace('T', ' ').substring(0, 17);
+            let tid = new Date().toLocaleString('en-GB', {
+                hour12: false,
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+            });
 
             const res = await fetch('/sendMelding', {
                 method: 'POST',
