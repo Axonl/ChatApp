@@ -2,6 +2,7 @@
 const express = require('express');
 const app = express();
 const PORT = 3000;
+var session = require('express-session');
 
 // setter opp Bcrypt
 const bcrypt = require('bcrypt');
@@ -38,6 +39,15 @@ db.prepare(`
 `).run();
 
 
+app.use(
+    session({
+    secret: "4@DvXQAUsKEHbtt!%jPi",
+    saveUninitialized: false,
+    resave: false,
+    cookie: { maxAge: 60000 * 60},
+    secure: false
+})
+);
 
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
@@ -55,6 +65,9 @@ app.get('/rom', (req, res) => {
 
 
 app.get('/hentMeldinger/:rom', (req, res) => {
+    if (!req.session.brukernavn) {
+        return res.status(401).json({ error: "Uautorisert tilgang til meldinger." });
+    }
     const rom = req.params.rom;
 
     const rows = db.prepare(`
@@ -66,17 +79,27 @@ app.get('/hentMeldinger/:rom', (req, res) => {
     res.json(rows);
 });
 app.get('/alleRom', (req, res) => {
+
+    if (!req.session.brukernavn) {
+        return res.status(401).json({ error: "Uautorisert tilgang til rom." });
+    }
+
     const rows = db.prepare("SELECT * FROM Rom").all();
     res.json(rows);
 });
 
 app.get('/rom:romid', (req, res) => {
+    
+        if (!req.session.brukernavn) {
+        return res.status(401).json({ error: "Uautorisert tilgang." });
+    }
+
     const id = req.params.romid;
     const row = db.prepare("SELECT * FROM Rom WHERE romid = ?").get(id);
-    res.sendFile(__dirname + '/public/chat.html');
     if (!row) {
         return res.status(404).send("Rom finnes ikke.");
     } 
+        res.sendFile(__dirname + '/public/chat.html');
 });
 
 app.post("/signup", async (req, res) => {
@@ -121,6 +144,7 @@ try { const bruker = db.prepare("SELECT * FROM Bruker wHERE Brukernavn = ?").get
     }
 
     if (match) {
+        req.session.brukernavn = brukernavn;
         console.log(`Bruker logget inn: ${brukernavn} (ID: ${bruker.Brukerid})`);
         return res.status(200).json({ message: "Innlogging vellykket." });
     }
@@ -155,15 +179,22 @@ app.post("/lagRom", (req, res) => {
 });
 
 app.post("/sendMelding", (req, res) => {
+    
+    if (!req.session.brukernavn) {
+        return res.status(401).json({ error: "Du må være logget inn for å sende melding." });
+    }
+    
+    const person = req.session.brukernavn;
+    
     try {
-        let { person, melding, tid, rom } = req.body;
+        let { melding, tid, rom } = req.body;
 
-        person = person.toString().trim();
+       // person = person.toString().trim();
         melding = melding.toString().trim();
         tid = tid.toString().trim();
         rom = rom.toString().trim();
 
-        console.log("motatt melding:", { person, melding, tid, rom });
+        console.log("motatt melding:", { melding, tid, rom });
 
         db.prepare("INSERT INTO melding (person, melding, tid, rom) VALUES (?, ?, ?, ?)")
           .run(person, melding, tid, rom);

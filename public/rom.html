@@ -20,6 +20,11 @@
 
     <script>
         const romDiv = document.getElementById("romDiv");
+        const innloggetBruker = sessionStorage.getItem('chatBrukernavn');
+
+        if (!innloggetBruker) {
+        alert("Du må logge inn for å få tilgang til rom!");
+        window.location.href = "/";}
 
         async function hentRom() {
             const response = await fetch('/alleRom');
