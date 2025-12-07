@@ -1,134 +1,36 @@
-/* Dark page base */
-body {
-    margin: 0;
-    padding: 0;
-    font-family: Arial, Helvetica, sans-serif;
-    background: #0b0c10;
-    color: #e5e5e5;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding-top: 40px;
+#utskrift{
+    width: 1800px; /* Set a width for your box */
+    height: 480px; /* Set a fixed height for your box */
+    border: 1px solid #ccc; /* Add a border for visibility */
+    overflow: auto; /* This is the key property for scrolling */
+    padding: 10px; /* Add some padding if desired */
 }
 
-/* Headings */
-h1 {
-    font-size: 28px;
-    color: #f0f0f0;
-    margin-bottom: 20px;
-}
-
-/* Forms */
-form {
-    background: #1a1c22;
-    padding: 25px;
-    margin: 20px 0;
-    border-radius: 12px;
-    width: 320px;
-    box-shadow: 0px 4px 15px rgba(0,0,0,0.5);
-    border: 1px solid #2a2d36;
-}
-
-label {
-    font-weight: bold;
-    color: #cfcfcf;
-}
-
-/* Inputs */
-input {
-    width: 100%;
-    padding: 10px;
-    margin: 10px 0 18px;
-    border: 1px solid #3b3f4b;
-    border-radius: 8px;
-    background: #15171c;
-    color: #fff;
-    font-size: 14px;
-    transition: 0.25s;
-}
-
-input:focus {
-    border-color: #4e8df5;
-    box-shadow: 0 0 6px rgba(78,141,245,0.4);
-    outline: none;
-}
-
-/* Buttons */
-button {
-    width: 100%;
-    padding: 10px;
-    background: #4e8df5;
-    border: none;
-    border-radius: 8px;
+body{
+    display:flex;
+    justify-content: center;
+    background-color: rgb(41, 40, 40) ;
     color: white;
-    font-size: 15px;
-    cursor: pointer;
-    transition: 0.2s;
 }
 
-button:hover {
-    background: #3d75d0;
-}
-
-/* Chat container */
-#utskrift {
-    width: 90%;
-    max-width: 600px;
-    height: 420px;
-    background: #14151a;
-    border-radius: 12px;
-    padding: 15px;
-    overflow-y: auto;
-    box-shadow: 0px 3px 15px rgba(0,0,0,0.5);
-    margin-bottom: 20px;
-    border: 1px solid #1f2127;
-}
-
-/* Chat messages */
-#utskrift div {
-    background: #1c1e25;
-    padding: 10px 12px;
-    border-radius: 8px;
-    margin-bottom: 10px;
-    border: 1px solid #262931;
-}
-
-.tid {
-    color: #7d87a0;
+.tid{
+    color: grey;
     font-size: 12px;
 }
 
-/* Chat message form */
-#skjema {
+#romDiv{
     display: flex;
-    gap: 10px;
-    width: 90%;
-    max-width: 600px;
+    flex-direction: column;
+    align-items: center;
 }
 
-#skjema input {
-    flex: 1;
+#Romskjema{
+margin-left: 300px;
 }
 
-#skjema button {
-    width: 130px;
-}
-
-/* Room list */
-#romDiv button {
-    width: 100%;
-    padding: 12px;
-    font-size: 16px;
-    margin-bottom: 12px;
-    border-radius: 10px;
-    border: 1px solid #262931;
-    background: #1a1c22;
-    color: #e6e6e6;
-    transition: 0.25s;
-    cursor: pointer;
-}
-
-#romDiv button:hover {
-    background: #22252c;
-    border-color: #3b3f4b;
+a{
+    color: white;
+    text-decoration: none;
+    font-size: 20px;
+    margin-bottom: 20px;
 }
