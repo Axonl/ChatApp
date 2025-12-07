@@ -24,7 +24,7 @@ db.prepare(`
 `).run();
 
 db.prepare(`
-    CREATE TABLE IF NOT EXISTS Rom (
+    CREATE TABLE IF NOT EXISTS rom (
         romid INTEGER PRIMARY KEY AUTOINCREMENT,
         Navn TEXT NOT NULL
     )
