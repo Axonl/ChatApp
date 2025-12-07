@@ -60,6 +60,9 @@ app.get('/', (req, res) => {
 });
 
 app.get('/rom', (req, res) => {
+        if (!req.session.brukernavn) {
+        return res.status(401).json({ error: "Uautorisert tilgang til rom." });
+    }
     res.sendFile(__dirname + '/public/rom.html');
 });
 
@@ -189,7 +192,6 @@ app.post("/sendMelding", (req, res) => {
     try {
         let { melding, tid, rom } = req.body;
 
-       // person = person.toString().trim();
         melding = melding.toString().trim();
         tid = tid.toString().trim();
         rom = rom.toString().trim();
