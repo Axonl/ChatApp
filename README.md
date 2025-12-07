@@ -25,3 +25,7 @@ Jeg har lagt til muligheten for å lage rom som kun viser meldinger som ble send
             }
         }
 ```
+
+<video width="640" height="360" controls>
+  <source src="C:\ChatApp\ChatApp\KodeForklaring.mp4" type="video/mp4">
+</video>
