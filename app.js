@@ -44,7 +44,7 @@ app.use(
     secret: "4@DvXQAUsKEHbtt!%jPi",
     saveUninitialized: false,
     resave: false,
-    cookie: { maxAge: 60000 * 60},
+    cookie: { maxAge: 60000 * 60 * 24 }, // 1 dag
     secure: false
 })
 );

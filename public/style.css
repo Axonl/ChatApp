@@ -1,36 +1,174 @@
-#utskrift{
-    width: 1800px; /* Set a width for your box */
-    height: 480px; /* Set a fixed height for your box */
-    border: 1px solid #ccc; /* Add a border for visibility */
-    overflow: auto; /* This is the key property for scrolling */
-    padding: 10px; /* Add some padding if desired */
+/* ======================================= */
+/* Css skrevet av gemini :) */
+/* ======================================= */
+
+/* Global Reset: Sikrer konsistent box-modell */
+*, *::before, *::after {
+    box-sizing: border-box;
 }
 
-body{
-    display:flex;
-    justify-content: center;
-    background-color: rgb(41, 40, 40) ;
+:root {
+    /* Farge- og fontvariabler */
+    --primary-color: #007bff; 
+    --primary-color-hover: #0056b3;
+    --background-dark: #1e1e1e;
+    --container-bg: #2d2d30;
+    --text-light: #f1f1f1;
+    --text-muted: #aaaaaa;
+    --border-color: #444444;
+    --focus-ring: #66b3ff; 
+    --font-family: 'Arial', sans-serif;
+}
+
+/* --- GRUNNLEGGENDE STYLING --- */
+
+body {
+    display: flex;
+    flex-direction: column; 
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    padding: 20px;
+    background-color: var(--background-dark);
+    color: var(--text-light);
+    font-family: var(--font-family);
+    line-height: 1.5; 
+    
+}
+
+/* --- KONTROLL- OG FORMS STYLING --- */
+
+form { 
+    background-color: var(--container-bg);
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.45);
+    margin-bottom: 20px;
+    width: 100%;
+    max-width: 400px;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: var(--text-muted); 
+}
+
+input[type="text"],
+input[type="password"] {
+    width: 100%; 
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background-color: var(--background-dark);
+    color: var(--text-light);
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+input:focus {
+    border-color: var(--primary-color);
+    outline: 2px solid var(--focus-ring); 
+    outline-offset: 1px;
+    box-shadow: 0 0 0 1px var(--primary-color);
+}
+
+/* --- KNAPP STYLING --- */
+
+button[type="submit"],
+#skjema button,
+#romDiv button {
+    /* Felles stil for alle knapper */
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    background-color: var(--primary-color);
     color: white;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.1s;
 }
 
-.tid{
-    color: grey;
-    font-size: 12px;
+button[type="submit"]:hover,
+#skjema button:hover {
+    background-color: var(--primary-color-hover);
+    transform: translateY(-1px);
 }
 
-#romDiv{
+/* --- CHAT-SPESIFIKK STYLING (#utskrift) --- */
+
+#utskrift {
+    width: min(90vw, 800px); 
+    height: 50vh;
+    min-height: 250px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    overflow-y: auto;
+    padding: 15px;
+    background-color: var(--container-bg);
+    margin-bottom: 20px;
+}
+
+/* Stil for HVER melding (som er en direkte div i #utskrift) */
+#utskrift > div { 
+    transition: background-color 0.2s; 
+    background-color: transparent; 
+    cursor: default; 
+}
+
+/* HOVER-effekt: Når musen er over en melding */
+#utskrift > div:hover {
+    background-color: #3a3a3d; 
+}
+
+/* --- NAVIGASJON & ROM-OVERSiKT --- */
+
+#romDiv {
     display: flex;
     flex-direction: column;
     align-items: center;
+    gap: 10px; 
+    margin-bottom: 30px;
 }
 
-#Romskjema{
-margin-left: 300px;
+#romDiv button {
+    width: 300px; 
+    background-color: #4a4a4a;
+    color: var(--text-light);
+}
+
+#romDiv button:hover {
+    background-color: #6a6a6a;
+    color: var(--primary-color);
+}
+
+/* --- CHAT INNPUT OVERSTYRING --- */
+
+#skjema {
+    display: flex;
+    width: min(90vw, 800px);
+    padding: 0;
+    background: none; 
+    box-shadow: none;
+}
+
+#skjema input[type="text"] {
+    flex-grow: 1; 
+    margin-right: 10px;
+    margin-bottom: 0; 
+}
+
+#skjema button {
+    width: 150px;
+    flex-shrink: 0; 
+}
+
+.tid{
+    color: var(--text-muted);
+    font-size: 0.75em;
 }
 
 a{
-    color: white;
-    text-decoration: none;
-    font-size: 20px;
-    margin-bottom: 20px;
+    color: var(--text-light);
 }
