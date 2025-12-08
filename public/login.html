@@ -64,7 +64,7 @@
                const data = await response.json();
                if (response.ok) {
                    alert("Registrering vellykket! Du kan nå logge inn.");
-                   window.location.href = "login.html";
+                   window.location.reload(true);
                } else {
                    alert(`Feil: ${data.error}`);
                }
