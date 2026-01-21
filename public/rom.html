@@ -7,12 +7,16 @@
     <title>Document</title>
 </head>
 <body>
-    <h1 id="Logo">Chatapp</h1>
+    <div class="header-container">
+        <h1 id="Logo">Chatapp</h1>
+        <button id="logoutBtn">Logg ut</button>
+    </div>
+
     <div id="romDiv">
         <!--Fylles ut av js-->
     </div>
 
-    <form id="Romskjema">
+    <form id="Romskjema" style="display: none;">
         <label for="Romnavn">Rom navn:</label>
         <input type="text" id="navn" required>
          <button type="submit">Lag rom</button>
@@ -26,6 +30,11 @@
         if (!innloggetBruker) {
         alert("Du må logge inn for å få tilgang til rom!");
         window.location.href = "/";}
+
+        // Vis rom-form kun for admins
+        if (isAdmin) {
+            document.getElementById('Romskjema').style.display = 'block';
+        }
 
         async function hentRom() {
             const response = await fetch('/alleRom');
@@ -68,6 +77,11 @@
                 }
             }
         }
+
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+        sessionStorage.clear();
+        window.location.href = '/';
+        });
 
         hentRom();
 

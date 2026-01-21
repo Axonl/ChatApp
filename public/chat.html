@@ -7,8 +7,11 @@
     <title>Chatapp</title>
 </head>
 <body>
-    <a href="rom.html">>Tilbake<</a>
-    <h1>Chatapp</h1>
+    <div class="header-container">
+        <a href="rom.html">← Tilbake</a>
+        <h1>Chatapp</h1>
+        <button id="logoutBtn">Logg ut</button>
+    </div>
     <div id="utskrift">
         <!-- Fylles ut av JS -->
     </div>
@@ -35,12 +38,12 @@
        async function skrivUtMeldinger() { //skriver ut meldinger fra databasen
     // Sjekk om brukeren er nederst før oppdatering
     const wasAtBottom = utskrift.scrollTop + utskrift.clientHeight >= utskrift.scrollHeight - 10;
-    
-    utskrift.innerHTML = '';
 
     const response = await fetch(`/hentMeldinger/${rom}`);
     const meldinger = await response.json();
 
+    // Bruk DocumentFragment for å unngå blinking
+    const fragment = document.createDocumentFragment();
 
     meldinger.forEach(melding => {
         const div = document.createElement('div');
@@ -64,8 +67,12 @@
         div.appendChild(document.createElement('br'));
         div.appendChild(document.createElement('br'));
 
-        utskrift.appendChild(div);
+        fragment.appendChild(div);
     });
+
+    // Bytt innholdet kun en gang
+    utskrift.innerHTML = '';
+    utskrift.appendChild(fragment);
     
     // Scroll kun ned hvis brukeren var allerede nederst
     if (wasAtBottom) {
@@ -84,7 +91,7 @@ async function slettMelding(meldingId) {
         skrivUtMeldinger();
 
         // Oppdater chatten hver 5 sekund for alle brukere
-        setInterval(skrivUtMeldinger, 5000);
+        setInterval(skrivUtMeldinger, 2000);
 
         skjema.addEventListener('submit', sendMelding);
 
@@ -117,6 +124,11 @@ async function slettMelding(meldingId) {
                 meldingEl.value = '';
             }
         }
+
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+        sessionStorage.clear();
+        window.location.href = '/';
+    });
     </script>
 </body>
 </html>

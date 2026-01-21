@@ -139,7 +139,7 @@ if (!brukernavn || !passord) {
     return res.status(400).json({ error: "Brukernavn og passord er påkrevd." });
 }
 
-try { const bruker = db.prepare("SELECT * FROM Bruker wHERE Brukernavn = ?").get(brukernavn);
+try { const bruker = db.prepare("SELECT * FROM Bruker WHERE Brukernavn = ?").get(brukernavn);
     
     if (!bruker) {
         return res.status(401).json({ error: "Ugyldig brukernavn eller passord." });

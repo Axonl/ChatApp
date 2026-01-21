@@ -7,33 +7,33 @@
     <title>Login</title>
 </head>
 <body>
-    <h1>Registrer deg</h1>
-    <form id="RegistrerForm">
-        <label for="Brukernavn">Brukernavn:</label>
-        <input type="text" id="reg-brukernavn" required>
-        <br>
-        <label for="Passord">Passord:</label>
-        <input type="password" id="reg-passord" required>
-        <br>
-        <button type="submit">Registrer</button>
-    </form>
-    
-    <h1>Logg inn</h1>
-    <form id="LoginForm">
-        <label for="Brukernavn">Brukernavn:</label>
-        <input type="text" id="log-brukernavn" required>
-        <br>
-        <label for="Passord">Passord:</label>
-        <input type="password" id="log-passord" required>
-        <br>
-        <button type="submit">Login</button>
-    </form>
+    <div class="auth-card">
+        <div class="tabs">
+            <button id="tab-login" class="tab active">Logg inn</button>
+            <button id="tab-register" class="tab">Registrer</button>
+        </div>
 
-    <div id="meldinger"> <!--Feilmeldinger skal skrives ut her-->
-        <!-- Javascript -->
+        <div class="tab-panels">
+            <form id="LoginForm" class="panel active">
+                <label for="Brukernavn">Brukernavn:</label>
+                <input type="text" id="log-brukernavn" required>
+                <label for="Passord">Passord:</label>
+                <input type="password" id="log-passord" required>
+                <button type="submit">Login</button>
+            </form>
+
+            <form id="RegistrerForm" class="panel">
+                <label for="Brukernavn">Brukernavn:</label>
+                <input type="text" id="reg-brukernavn" required>
+                <label for="Passord">Passord:</label>
+                <input type="password" id="reg-passord" required>
+                <button type="submit">Registrer</button>
+            </form>
+        </div>
+
+        <div id="meldinger" aria-live="polite"></div>
     </div>
 
-    
     <script>
         const RegistrerForm = document.getElementById('RegistrerForm');
         const RegBrukernavnEl = document.getElementById('reg-brukernavn');
@@ -43,73 +43,102 @@
         const LogBrukernavnEl = document.getElementById('log-brukernavn');
         const LogPassordEl = document.getElementById('log-passord');
 
-        RegistrerForm.addEventListener("submit", registrer)
+        const meldingerDiv = document.getElementById('meldinger');
+
+        const tabLogin = document.getElementById('tab-login');
+        const tabRegister = document.getElementById('tab-register');
+
+        function showMessage(text, type = 'error') {
+            meldingerDiv.textContent = text;
+            meldingerDiv.className = type;
+        }
+
+        function clearMessage() {
+            meldingerDiv.textContent = '';
+            meldingerDiv.className = '';
+        }
+
+        [RegBrukernavnEl, RegPassordEl, LogBrukernavnEl, LogPassordEl].forEach(el => el && el.addEventListener('input', clearMessage));
+
+        tabLogin.addEventListener('click', () => {
+            tabLogin.classList.add('active');
+            tabRegister.classList.remove('active');
+            document.querySelector('#LoginForm').classList.add('active');
+            document.querySelector('#RegistrerForm').classList.remove('active');
+            clearMessage();
+        });
+
+        tabRegister.addEventListener('click', () => {
+            tabRegister.classList.add('active');
+            tabLogin.classList.remove('active');
+            document.querySelector('#RegistrerForm').classList.add('active');
+            document.querySelector('#LoginForm').classList.remove('active');
+            clearMessage();
+        });
+
+        LoginForm.addEventListener('submit', login);
+        RegistrerForm.addEventListener('submit', registrer);
 
         async function registrer(e) {
             e.preventDefault();
-            const brukernavn = RegBrukernavnEl.value;
-            const passord = RegPassordEl.value;
+            const brukernavn = RegBrukernavnEl.value.trim();
+            const passord = RegPassordEl.value.trim();
 
             if (!brukernavn || !passord) {
-                alert("Vennligst fyll ut alle felt.");
+                showMessage('Vennligst fyll ut alle felt.', 'error');
                 return;
             }
-            
+
             try {
-                const response = await fetch("/signup", {
-                    method: "POST",
-                    headers:{ "Content-Type":"application/json" },
+                const response = await fetch('/signup', {
+                    method: 'POST',
+                    headers:{ 'Content-Type':'application/json' },
                     body: JSON.stringify({ brukernavn, passord})
                });
                const data = await response.json();
                if (response.ok) {
-                   alert("Registrering vellykket! Du kan nå logge inn.");
-                   window.location.reload(true);
+                   showMessage('Registrering vellykket! Du kan nå logge inn.', 'success');
+                   RegBrukernavnEl.value = '';
+                   RegPassordEl.value = '';
+                   tabLogin.click();
                } else {
-                   alert(`Feil: ${data.error}`);
+                   showMessage('Feil: ' + (data.error || 'Ukjent feil'),'error');
                }
             }
             catch (error) {
-                console.error("Feil under registrering:", error);
-                alert("En feil oppstod under registreringen. Vennligst prøv igjen senere.");
+                console.error('Feil under registrering:', error);
+                showMessage('En feil oppstod under registreringen. Vennligst prøv igjen senere.', 'error');
             }
         }
 
-        LoginForm.addEventListener("submit", login)
-
         async function login(e) {
             e.preventDefault();
-            const brukernavn = LogBrukernavnEl.value;
-            const passord = LogPassordEl.value;
+            const brukernavn = LogBrukernavnEl.value.trim();
+            const passord = LogPassordEl.value.trim();
             if (!brukernavn || !passord) {
-                alert("Vennligst fyll ut alle felt.");
+                showMessage('Vennligst fyll ut alle felt.', 'error');
                 return;
             }
             try {
-                    const response = await fetch("/login", {
-                        method: "POST",
-                        headers:{ "Content-Type":"application/json" },
-                        body: JSON.stringify({ brukernavn, passord})
-                    });
-                    const data = await response.json();
-                    if (response.ok) {
-                        sessionStorage.setItem('chatBrukernavn', brukernavn);
-                        sessionStorage.setItem('isAdmin', data.isAdmin); // Lagrer admin-status
-                        alert(`Innlogging vellykket! Velkommen, ${brukernavn}.`);
-                    window.location.href = "/rom";
-                    } 
-                    
-                    else {alert(`Feil: ${data.error}`)};
-                
+                const response = await fetch('/login', {
+                    method: 'POST',
+                    headers:{ 'Content-Type':'application/json' },
+                    body: JSON.stringify({ brukernavn, passord})
+                });
+                const data = await response.json();
+                if (response.ok) {
+                    sessionStorage.setItem('chatBrukernavn', brukernavn);
+                    sessionStorage.setItem('isAdmin', data.isAdmin);
+                    showMessage('Innlogging vellykket! Velkommen, ' + brukernavn + '.', 'success');
+                    setTimeout(() => window.location.href = '/rom', 600);
+                } else {
+                    showMessage('Feil: ' + (data.error || 'Ugyldig brukernavn eller passord.'), 'error');
                 }
-            
-                catch (error) {
-                console.error("Feil under innlogging:", error);
-                alert("En feil oppstod under innloggingen. Vennligst prøv igjen senere.");
+            } catch (error) {
+                console.error('Feil under innlogging:', error);
+                showMessage('En feil oppstod under innloggingen. Vennligst prøv igjen senere.', 'error');
             }
-
-    }
+        }
     </script>
-
 </body>
 </html>
