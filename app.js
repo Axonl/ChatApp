@@ -34,7 +34,8 @@ db.prepare(`
     CREATE TABLE IF NOT EXISTS bruker (
         Brukerid INTEGER PRIMARY KEY AUTOINCREMENT,
         Brukernavn TEXT NOT NULL UNIQUE, 
-        Passord_Hash TEXT NOT NULL
+        Passord_Hash TEXT NOT NULL,
+        Admin INTEGER DEFAULT 0
     )
 `).run();
 
@@ -112,9 +113,11 @@ app.post("/signup", async (req, res) => {
     }
 
     try {
+        console.time();
         const hashedPassord = await bcrypt.hash(passord, saltRounds);
         const info = db.prepare("INSERT INTO bruker (Brukernavn, Passord_Hash) VALUES (?, ?)").run(brukernavn, hashedPassord);
         console.log(`Ny bruker registrert: ${brukernavn} (ID: ${info.lastInsertRowid})`);
+        console.timeEnd();
         return res.status(201).json({ message: "Bruker registrert." });
     } 
     catch (err) {
@@ -148,11 +151,10 @@ try { const bruker = db.prepare("SELECT * FROM Bruker wHERE Brukernavn = ?").get
 
     if (match) {
         req.session.brukernavn = brukernavn;
+        req.session.isAdmin = bruker.Admin === 1; // Lagrer admin-status
         console.log(`Bruker logget inn: ${brukernavn} (ID: ${bruker.Brukerid})`);
-        return res.status(200).json({ message: "Innlogging vellykket." });
+        return res.status(200).json({ message: "Innlogging vellykket.", isAdmin: bruker.Admin === 1 });
     }
-
-    return res.status(200).json({ message: "Innlogging vellykket." });
 
     } catch (err) {
     console.error("Feil ved innlogging:", err);
@@ -163,6 +165,10 @@ try { const bruker = db.prepare("SELECT * FROM Bruker wHERE Brukernavn = ?").get
 
 
 app.post("/lagRom", (req, res) => {
+    if (!req.session.brukernavn) {
+        return res.status(401).json({ error: "Du må være logget inn for å opprette rom." });
+    }
+    
     try {
         let { navn } = req.body;
         navn = navn.toString().trim();
@@ -208,6 +214,39 @@ app.post("/sendMelding", (req, res) => {
         return res
             .status(500)
             .json({ error: "Kunne ikke lagre meldingen" });
+    }
+});
+
+app.delete("/slettMelding/:id", (req, res) => {
+    if (!req.session.isAdmin) {
+        return res.status(403).json({ error: "Du har ikke tillatelse til å slette meldinger." });
+    }
+    
+    try {
+        const id = req.params.id;
+        db.prepare("DELETE FROM melding WHERE id = ?").run(id);
+        return res.sendStatus(200);
+    } catch (err) {
+        console.error("Feil ved sletting av melding:", err);
+        return res.status(500).json({ error: "Kunne ikke slette meldingen" });
+    }
+});
+
+app.delete("/slettRom/:romid", (req, res) => {
+    if (!req.session.isAdmin) {
+        return res.status(403).json({ error: "Du har ikke tillatelse til å slette rom." });
+    }
+    
+    try {
+        const romid = req.params.romid;
+        // Sletter først alle meldinger i rommet
+        db.prepare("DELETE FROM melding WHERE rom = ?").run(romid);
+        // Deretter sletter rommet
+        db.prepare("DELETE FROM Rom WHERE romid = ?").run(romid);
+        return res.sendStatus(200);
+    } catch (err) {
+        console.error("Feil ved sletting av rom:", err);
+        return res.status(500).json({ error: "Kunne ikke slette rommet" });
     }
 });
 

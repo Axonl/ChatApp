@@ -1,173 +1,271 @@
-/* ======================================= */
-/* Css skrevet av gemini :) */
-/* ======================================= */
-
-/* Global Reset: Sikrer konsistent box-modell */
-*, *::before, *::after {
+* {
+    margin: 0;
+    padding: 0;
     box-sizing: border-box;
 }
 
-:root {
-    /* Farge- og fontvariabler */
-    --primary-color: #007bff; 
-    --primary-color-hover: #0056b3;
-    --background-dark: #1e1e1e;
-    --container-bg: #2d2d30;
-    --text-light: #f1f1f1;
-    --text-muted: #aaaaaa;
-    --border-color: #444444;
-    --focus-ring: #66b3ff; 
-    --font-family: 'Arial', sans-serif;
-}
-
-/* --- GRUNNLEGGENDE STYLING --- */
-
 body {
-    display: flex;
-    flex-direction: column; 
-    align-items: center;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     min-height: 100vh;
-    margin: 0;
     padding: 20px;
-    background-color: var(--background-dark);
-    color: var(--text-light);
-    font-family: var(--font-family);
-    line-height: 1.5; 
 }
 
-/* --- KONTROLL- OG FORMS STYLING --- */
+/* Login og registrering */
+h1 {
+    color: #333;
+    margin: 30px 0 20px 0;
+    text-align: center;
+    font-size: 2.5em;
+}
 
-form { 
-    background-color: var(--container-bg);
-    padding: 25px;
-    border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.45);
-    margin-bottom: 20px;
-    width: 100%;
+form {
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     max-width: 400px;
+    margin: 20px auto;
 }
 
 label {
     display: block;
+    margin-top: 15px;
     margin-bottom: 5px;
-    font-weight: bold;
-    color: var(--text-muted); 
+    color: #333;
+    font-weight: 500;
 }
 
 input[type="text"],
 input[type="password"] {
-    width: 100%; 
+    width: 100%;
     padding: 10px;
     margin-bottom: 15px;
-    border: 1px solid var(--border-color);
-    border-radius: 4px;
-    background-color: var(--background-dark);
-    color: var(--text-light);
-    transition: border-color 0.2s, box-shadow 0.2s;
+    border: 2px solid #ddd;
+    border-radius: 5px;
+    font-size: 1em;
+    transition: border-color 0.3s;
 }
 
-input:focus {
-    border-color: var(--primary-color);
-    outline: 2px solid var(--focus-ring); 
-    outline-offset: 1px;
-    box-shadow: 0 0 0 1px var(--primary-color);
+input[type="text"]:focus,
+input[type="password"]:focus {
+    outline: none;
+    border-color: #667eea;
 }
 
-/* --- KNAPP STYLING --- */
-
-button[type="submit"],
-#skjema button,
-#romDiv button {
-    /* Felles stil for alle knapper */
-    padding: 10px 15px;
-    border: none;
-    border-radius: 4px;
-    background-color: var(--primary-color);
+button {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
-    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    font-size: 1em;
+    font-weight: 600;
     cursor: pointer;
-    transition: background-color 0.2s, transform 0.1s;
+    transition: transform 0.2s, box-shadow 0.2s;
+    margin-top: 10px;
 }
 
-button[type="submit"]:hover,
-#skjema button:hover {
-    background-color: var(--primary-color-hover);
-    transform: translateY(-1px);
+button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(102, 126, 234, 0.4);
 }
 
-/* --- CHAT-SPESIFIKK STYLING (#utskrift) --- */
-
-#utskrift {
-    width: min(90vw, 800px); 
-    height: 50vh;
-    min-height: 250px;
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    overflow-y: auto;
-    padding: 15px;
-    background-color: var(--container-bg);
-    margin-bottom: 20px;
+button:active {
+    transform: translateY(0);
 }
 
-/* Stil for HVER melding (som er en direkte div i #utskrift) */
-#utskrift > div { 
-    transition: background-color 0.2s; 
-    background-color: transparent; 
-    cursor: default; 
+#meldinger {
+    color: #e74c3c;
+    text-align: center;
+    margin-top: 20px;
+    font-weight: 500;
 }
 
-/* HOVER-effekt: Når musen er over en melding */
-#utskrift > div:hover {
-    background-color: #3a3a3d; 
+/* Rom side */
+#Logo {
+    text-align: center;
+    color: white;
+    font-size: 3em;
+    margin-bottom: 30px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
 }
-
-/* --- NAVIGASJON & ROM-OVERSiKT --- */
 
 #romDiv {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin: 30px auto;
+    max-width: 1000px;
+}
+
+.romContainer {
+    position: relative;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    gap: 10px; 
-    margin-bottom: 30px;
+    gap: 8px;
 }
 
-#romDiv button {
-    width: 300px; 
-    background-color: #4a4a4a;
-    color: var(--text-light);
+.romBtn {
+    padding: 20px;
+    font-size: 1.2em;
+    background: white;
+    color: #667eea;
+    font-weight: bold;
+    border: 2px solid #667eea;
+    border-radius: 10px;
+    transition: all 0.3s;
+    width: 100%;
 }
 
-#romDiv button:hover {
-    background-color: #6a6a6a;
-    color: var(--primary-color);
+.romBtn:hover {
+    background: #667eea;
+    color: white;
+    transform: scale(1.05);
 }
 
-/* --- CHAT INNPUT OVERSTYRING --- */
+.slettRomBtn {
+    padding: 8px 12px !important;
+    font-size: 0.9em !important;
+    background: #e74c3c !important;
+    color: white !important;
+    border: none !important;
+    width: 100% !important;
+    margin-top: 0 !important;
+}
+
+.slettRomBtn:hover {
+    background: #c0392b !important;
+}
+
+#Romskjema {
+    max-width: 500px;
+    margin: 30px auto;
+}
+
+/* Chat side */
+a {
+    color: white;
+    text-decoration: none;
+    font-size: 1.1em;
+    display: inline-block;
+    margin-bottom: 20px;
+    padding: 10px 20px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 5px;
+    transition: all 0.3s;
+}
+
+a:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+#utskrift {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    max-width: 800px;
+    margin: 20px auto;
+    height: 500px;
+    overflow-y: auto;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+#utskrift div {
+    margin-bottom: 15px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #eee;
+    word-wrap: break-word;
+}
+
+.tid {
+    color: #999;
+    font-size: 0.9em;
+    font-weight: bold;
+}
+
+#utskrift button {
+    padding: 5px 10px;
+    font-size: 0.8em;
+    background: #e74c3c;
+    margin-left: 10px;
+    margin-top: 5px;
+    width: auto;
+}
+
+#utskrift button:hover {
+    background: #c0392b;
+}
 
 #skjema {
+    max-width: 800px;
+    margin: 20px auto;
     display: flex;
-    width: min(90vw, 800px);
-    padding: 0;
-    background: none; 
-    box-shadow: none;
+    gap: 10px;
 }
 
-#skjema input[type="text"] {
-    flex-grow: 1; 
-    margin-right: 10px;
-    margin-bottom: 0; 
+#skjema label {
+    display: none;
+}
+
+#skjema input {
+    flex: 1;
+    padding: 12px;
+    border: 2px solid #667eea;
+    border-radius: 5px;
+    font-size: 1em;
+    margin: 0;
 }
 
 #skjema button {
-    width: 150px;
-    flex-shrink: 0; 
+    padding: 12px 30px;
+    width: auto;
+    margin: 0;
 }
 
-.tid{
-    color: var(--text-muted);
-    font-size: 0.75em;
+/* Scrollbar styling */
+#utskrift::-webkit-scrollbar {
+    width: 8px;
 }
 
-a{
-    color: var(--text-light);
+#utskrift::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+#utskrift::-webkit-scrollbar-thumb {
+    background: #667eea;
+    border-radius: 10px;
+}
+
+#utskrift::-webkit-scrollbar-thumb:hover {
+    background: #764ba2;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+    h1 {
+        font-size: 1.8em;
+    }
+
+    #romDiv {
+        grid-template-columns: 1fr;
+    }
+
+    #skjema {
+        flex-direction: column;
+    }
+
+    #skjema input {
+        width: 100%;
+    }
+
+    #skjema button {
+        width: 100%;
+    }
+
+    form {
+        padding: 20px;
+    }
 }

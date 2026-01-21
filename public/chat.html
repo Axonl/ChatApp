@@ -25,6 +25,7 @@
         const meldingEl = document.getElementById('melding');
         const rom = window.location.pathname.split("/rom")[1];
         const innloggetBruker = sessionStorage.getItem('chatBrukernavn');
+        const isAdmin = sessionStorage.getItem('isAdmin') === 'true'; // Henter admin-status
 
         if (!innloggetBruker) {
         alert("Du må logge inn for å få tilgang til chatten!");
@@ -32,6 +33,9 @@
             
 
        async function skrivUtMeldinger() { //skriver ut meldinger fra databasen
+    // Sjekk om brukeren er nederst før oppdatering
+    const wasAtBottom = utskrift.scrollTop + utskrift.clientHeight >= utskrift.scrollHeight - 10;
+    
     utskrift.innerHTML = '';
 
     const response = await fetch(`/hentMeldinger/${rom}`);
@@ -48,16 +52,39 @@
         div.appendChild(tidSpan);
         div.appendChild(document.createElement('br'));
         div.appendChild(document.createTextNode(`${melding.person}: ${melding.melding}`));
+        
+        // Viser slett-knapp kun for admins
+        if (isAdmin) {
+            const slettBtn = document.createElement('button');
+            slettBtn.textContent = 'Slett';
+            slettBtn.onclick = () => slettMelding(melding.id);
+            div.appendChild(slettBtn);
+        }
+        
         div.appendChild(document.createElement('br'));
         div.appendChild(document.createElement('br'));
 
         utskrift.appendChild(div);
     });
-    utskrift.scrollTop = utskrift.scrollHeight;
+    
+    // Scroll kun ned hvis brukeren var allerede nederst
+    if (wasAtBottom) {
+        utskrift.scrollTop = utskrift.scrollHeight;
+    }
+}
+
+async function slettMelding(meldingId) {
+    if (confirm('Er du sikker på at du vil slette denne meldingen?')) {
+        await fetch(`/slettMelding/${meldingId}`, { method: 'DELETE' });
+        skrivUtMeldinger();
+    }
 }
 
 
         skrivUtMeldinger();
+
+        // Oppdater chatten hver 5 sekund for alle brukere
+        setInterval(skrivUtMeldinger, 5000);
 
         skjema.addEventListener('submit', sendMelding);
 
@@ -85,11 +112,11 @@
                 body: JSON.stringify({ person, melding, tid, rom })
             });
 
-            skrivUtMeldinger();
-            meldingEl.value = '';
-
+            if (res.ok) {
+                skrivUtMeldinger();
+                meldingEl.value = '';
+            }
         }
-setInterval(skrivUtMeldinger, 5000);
     </script>
 </body>
 </html>

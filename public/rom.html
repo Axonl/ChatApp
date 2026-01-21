@@ -21,6 +21,7 @@
     <script>
         const romDiv = document.getElementById("romDiv");
         const innloggetBruker = sessionStorage.getItem('chatBrukernavn');
+        const isAdmin = sessionStorage.getItem('isAdmin') === 'true';
 
         if (!innloggetBruker) {
         alert("Du må logge inn for å få tilgang til rom!");
@@ -31,16 +32,43 @@
             const rom = await response.json();
              romDiv.innerHTML = '';
             for (let Rom of rom) {
+                const romContainer = document.createElement('div');
+                romContainer.className = 'romContainer';
+
                 const btn = document.createElement('button');
                 btn.textContent = Rom.Navn;
+                btn.className = 'romBtn';
 
                 btn.onclick = () => {
                     window.location.href = `/rom${Rom.romid}`;
                 };
 
-                romDiv.appendChild(btn);
+                romContainer.appendChild(btn);
+
+                // Viser slett-knapp kun for admins
+                if (isAdmin) {
+                    const slettBtn = document.createElement('button');
+                    slettBtn.textContent = '✕ Slett';
+                    slettBtn.className = 'slettRomBtn';
+                    slettBtn.onclick = () => slettRom(Rom.romid, Rom.Navn);
+                    romContainer.appendChild(slettBtn);
+                }
+
+                romDiv.appendChild(romContainer);
             }
         }
+
+        async function slettRom(romid, romNavn) {
+            if (confirm(`Er du sikker på at du vil slette "${romNavn}"? Alle meldinger vil bli slettet.`)) {
+                const response = await fetch(`/slettRom/${romid}`, { method: 'DELETE' });
+                if (response.ok) {
+                    hentRom();
+                } else {
+                    alert('Feil ved sletting av rom');
+                }
+            }
+        }
+
         hentRom();
 
         Romskjema.addEventListener('submit', lagRom);
