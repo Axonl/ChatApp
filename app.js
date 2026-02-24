@@ -4,6 +4,8 @@ const app = express();
 const PORT = 3000;
 var session = require('express-session');
 
+require('dotenv').config();
+
 // setter opp Bcrypt
 const bcrypt = require('bcrypt');
 const saltRounds = 13;
@@ -42,7 +44,7 @@ db.prepare(`
 
 app.use(
     session({
-    secret: "4@DvXQAUsKEHbtt!%jPi",
+    secret: process.env.SESSION_SECRET,
     saveUninitialized: false,
     resave: false,
     cookie: { maxAge: 60000 * 60 * 24 }, // 1 dag
