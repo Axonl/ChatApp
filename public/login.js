@@ -1,0 +1,104 @@
+        const RegistrerForm = document.getElementById('RegistrerForm');
+        const RegBrukernavnEl = document.getElementById('reg-brukernavn');
+        const RegPassordEl = document.getElementById('reg-passord');
+
+        const LoginForm = document.getElementById('LoginForm');
+        const LogBrukernavnEl = document.getElementById('log-brukernavn');
+        const LogPassordEl = document.getElementById('log-passord');
+
+        const meldingerDiv = document.getElementById('meldinger');
+
+        const tabLogin = document.getElementById('tab-login');
+        const tabRegister = document.getElementById('tab-register');
+
+        function showMessage(text, type = 'error') {
+            meldingerDiv.textContent = text;
+            meldingerDiv.className = type;
+        }
+
+        function clearMessage() {
+            meldingerDiv.textContent = '';
+            meldingerDiv.className = '';
+        }
+
+        [RegBrukernavnEl, RegPassordEl, LogBrukernavnEl, LogPassordEl].forEach(el => el && el.addEventListener('input', clearMessage));
+
+        tabLogin.addEventListener('click', () => {
+            tabLogin.classList.add('active');
+            tabRegister.classList.remove('active');
+            document.querySelector('#LoginForm').classList.add('active');
+            document.querySelector('#RegistrerForm').classList.remove('active');
+            clearMessage();
+        });
+
+        tabRegister.addEventListener('click', () => {
+            tabRegister.classList.add('active');
+            tabLogin.classList.remove('active');
+            document.querySelector('#RegistrerForm').classList.add('active');
+            document.querySelector('#LoginForm').classList.remove('active');
+            clearMessage();
+        });
+
+        LoginForm.addEventListener('submit', login);
+        RegistrerForm.addEventListener('submit', registrer);
+
+        async function registrer(e) {
+            e.preventDefault();
+            const brukernavn = RegBrukernavnEl.value.trim();
+            const passord = RegPassordEl.value.trim();
+
+            if (!brukernavn || !passord) {
+                showMessage('Vennligst fyll ut alle felt.', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch('/signup', {
+                    method: 'POST',
+                    headers:{ 'Content-Type':'application/json' },
+                    body: JSON.stringify({ brukernavn, passord})
+               });
+               const data = await response.json();
+               if (response.ok) {
+                   showMessage('Registrering vellykket! Du kan nå logge inn.', 'success');
+                   RegBrukernavnEl.value = '';
+                   RegPassordEl.value = '';
+                   tabLogin.click();
+               } else {
+                   showMessage('Feil: ' + (data.error || 'Ukjent feil'),'error');
+               }
+            }
+            catch (error) {
+                console.error('Feil under registrering:', error);
+                showMessage('En feil oppstod under registreringen. Vennligst prøv igjen senere.', 'error');
+            }
+        }
+
+        async function login(e) {
+            e.preventDefault();
+            const brukernavn = LogBrukernavnEl.value.trim();
+            const passord = LogPassordEl.value.trim();
+            if (!brukernavn || !passord) {
+                showMessage('Vennligst fyll ut alle felt.', 'error');
+                return;
+            }
+            try {
+                const response = await fetch('/login', {
+                    method: 'POST',
+                    headers:{ 'Content-Type':'application/json' },
+                    body: JSON.stringify({ brukernavn, passord})
+                });
+                const data = await response.json();
+                if (response.ok) {
+                    sessionStorage.setItem('chatBrukernavn', brukernavn);
+                    sessionStorage.setItem('isAdmin', data.isAdmin);
+                    showMessage('Innlogging vellykket! Velkommen, ' + brukernavn + '.', 'success');
+                    setTimeout(() => window.location.href = '/rom', 600);
+                } else {
+                    showMessage('Feil: ' + (data.error || 'Ugyldig brukernavn eller passord.'), 'error');
+                }
+            } catch (error) {
+                console.error('Feil under innlogging:', error);
+                showMessage('En feil oppstod under innloggingen. Vennligst prøv igjen senere.', 'error');
+            }
+        }
